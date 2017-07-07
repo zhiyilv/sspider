@@ -12,4 +12,3 @@ soup = bs(page.content, 'lxml')
 
 
 
-
