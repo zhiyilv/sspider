@@ -90,3 +90,14 @@ for index in range(1, last_page):
         break
     else:
         soup = bs(page.content, 'lxml')
+
+
+
+
+
+
+
+
+
+
+
