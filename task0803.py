@@ -32,17 +32,7 @@ def testexcel():
 
 
 # ----------- functions from task_0718
-def parse_c(container):
-    teacher = container.find(class_='s-r-list-photo').p.text
-    if teacher == '无':
-        return None
-    title = container.find(class_='s-r-list-info').h3.text
-    price = container.find(class_='price').span.text
-    satisfaction = container.find(class_='pf').find_all('div')[-2].text[:-1]
-    info = container(text=re.compile('：'))[1:]
-    # subject, grade, opendate, schedule, location = [i.split('：')[-1].strip() for i in info]
-    info = [i.split('：')[-1].strip() for i in info]
-    return [teacher, title, price, satisfaction, *info]
+
 
 
 # parse_page for parsing a page of classes
@@ -50,6 +40,20 @@ def parse_page(page_soup):
     containers = page_soup(class_='s-r-list')
     classes = [parse_c(i) for i in containers]
     return [i for i in classes if i]
+
+def parse_c(container):
+    teacher = container.find(class_='s-r-list-photo').p.text
+    if teacher == '无':
+        return None
+    title = container.find(class_='s-r-list-info').h3.text
+    price = container.find(class_='price').span.text
+    intprice = int(price)
+    satisfaction = container.find(class_='pf').find_all('div')[-2].text[:-1]
+    intsa = int(satisfaction)
+    info = container(text=re.compile('：'))[1:]
+    # subject, grade, opendate, schedule, location = [i.split('：')[-1].strip() for i in info]
+    info = [i.split('：')[-1].strip() for i in info]
+    return [teacher, title, intprice, intsa, *info]
 
 
 # using webdriver to load page
@@ -59,15 +63,15 @@ def get(url):
     return nobrowser.page_source
 
 
-def save(data):
+def save(data, filename):
     df = pandas.DataFrame(data, columns=['teacher', 'title', 'price', 'satisfaction', 'subject', 'grade', 'duration', 'time', 'location'])
-    df.to_excel('result.xlsx')
+    df.to_excel('{}.xlsx'.format(filename))
 
 # --------run
 start_url = 'http://ssh.speiyou.com/search/index/subject:/grade:1/level:bx/term:/gtype:time'
 soup = bs(get(start_url), 'lxml')
 results = parse_page(soup)
-save(results)
+save(results, 'grade1')
 
 
 
